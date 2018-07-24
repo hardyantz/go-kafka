@@ -1,14 +1,15 @@
 package main
 
 import (
-	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"fmt"
 	"math/rand"
 	"strconv"
+
+	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
 func main() {
-	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers" : "localhost"})
+	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": "localhost"})
 
 	if err != nil {
 		panic(err)
@@ -17,9 +18,9 @@ func main() {
 	defer p.Close()
 
 	go func() {
-		for e:= range p.Events() {
+		for e := range p.Events() {
 			switch ev := e.(type) {
-				case *kafka.Message:
+			case *kafka.Message:
 				if ev.TopicPartition.Error != nil {
 					fmt.Printf("Delivery failed: %v\n", ev.TopicPartition)
 				} else {
@@ -33,8 +34,8 @@ func main() {
 	for {
 		word := "sku " + strconv.Itoa(rand.Int())
 		p.Produce(&kafka.Message{
-			TopicPartition: kafka.TopicPartition{Topic:&topic, Partition:kafka.PartitionAny},
-			Value: []byte(word),
+			TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
+			Value:          []byte(word),
 		}, nil)
 	}
 
