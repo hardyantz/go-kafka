@@ -1,0 +1,4 @@
+package: github.com/hardyantz/kafka-producer
+import:
+- package: github.com/confluentinc/confluent-kafka-go
+  version: v0.11.4
