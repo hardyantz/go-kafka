@@ -2,16 +2,21 @@ package main
 
 import (
 	"fmt"
-	"math/rand"
-	"strconv"
-
-	"github.com/confluentinc/confluent-kafka-go/kafka"
+			"github.com/confluentinc/confluent-kafka-go/kafka"
 )
+
+var topic = "plankton"
 
 func main() {
 	fmt.Println("sendingMessages")
 
-	sendMessage()
+	message := "test send message"
+
+	err := sendMessage(message)
+	if err != nil {
+		fmt.Println(err)
+	}
+
 }
 
 func sendEvents(p *kafka.Producer) {
@@ -27,8 +32,7 @@ func sendEvents(p *kafka.Producer) {
 	}
 }
 
-func sendMessage() error {
-	topic := "plankton"
+func sendMessage(message string) error {
 
 	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": "localhost"})
 	if err != nil {
@@ -37,11 +41,14 @@ func sendMessage() error {
 
 	go sendEvents(p)
 
-	word := "sku " + strconv.Itoa(rand.Int())
-	p.Produce(&kafka.Message{
+	err = p.Produce(&kafka.Message{
 		TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
-		Value:          []byte(word),
+		Value:          []byte(message),
 	}, nil)
+
+	if err != nil {
+		return err
+	}
 
 	p.Flush(15 * 1000)
 
