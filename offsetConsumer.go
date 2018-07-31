@@ -4,16 +4,16 @@ import (
 	"fmt"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
-	"strconv"
 )
 
-// set global variable for offset
-var offset = 29
-
 func main() {
+	var topic = "plankton"  // set topic
+	var offsetNumber = 29 // set offset number
+	var groupId = "plankton-group1" //  set group id
+
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
-		"bootstrap.servers": "localhost",
-		"group.id":          strconv.Itoa(offset),  // kafka will save group id, then if we change offset kafka still use this history offset
+		"bootstrap.servers":  "localhost",
+		"group.id":           groupId, // kafka will save group id, then if we change offset kafka still use this history offset
 		"enable.auto.commit": "false",
 	})
 
@@ -21,14 +21,12 @@ func main() {
 		panic(err)
 	}
 
-	topic := "plankton"
-
 	c.SubscribeTopics([]string{topic, "^aRegex.*[Tt]opic"}, nil)
 
 	// set offset
-	offset := kafka.Offset(offset)
+	offset := kafka.Offset(offsetNumber)
 	topicPartition := []kafka.TopicPartition{
-		{Partition:0, Topic:&topic, Offset:offset},
+		{Partition: 0, Topic: &topic, Offset: offset},
 	}
 
 	// commit offset
