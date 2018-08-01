@@ -164,8 +164,8 @@ $ go run offsetConsumer.go
 ## Retention log setup
 
 Log retention setup is The minimum age of a log file to be eligible for deletion due to age,
-means that kafka will save message for period of hours. default is 168 hours or 7 days
-to change this setup edit `config/server-properties` and change the value of
+means that kafka will save message for period of hours. default is 168 hours or 7 days,
+to change this setup edit `config/server.properties` and change the value of
 ```
 log.retention.hours=168
 ```
@@ -176,7 +176,7 @@ in kafka, you can set numbers of partition you want to setup.
 How to :
 
 #### edit config file
-edit config file in `config/server-properties` and change the value of
+edit config file in `config/server.properties` and change the value of
 ```
 num.partitions=3
 ```
