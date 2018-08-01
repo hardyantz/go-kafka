@@ -1,5 +1,5 @@
 
-this post is for beginner who want to learn basic kafka with golang. it is far from advance. if you think you are more advance than this post. please share some thought. thanks.
+this post is for beginner who want to learn basic kafka with golang. it is far from advance. if you think you are more advance than this. please share some thought. thanks.
 
 # Basic Kafka
 
@@ -40,10 +40,6 @@ Producers are the publisher of messages to one or more Kafka topics. Producers s
 Consumers read data from brokers. Consumers subscribes to one or more topics and consume published messages by pulling data from the brokers
 
 ![](https://www.tutorialspoint.com/apache_kafka/images/cluster_architecture.jpg)
-
-source :
-* tutorialspoint.com
-* kafka.apache.org
 
 
 # Install Kafka
@@ -119,5 +115,188 @@ in case we want to retrieve message from offset 1 (in kafka, offset start from 0
 $ ./bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --offset 1 --partition 0
 ```
 
+# Kafka With Golang
+
+in this repository you can learn how to use basic usage of kafka with golang
+
+how to :
+* install librdkafka => https://github.com/edenhill/librdkafka/tree/master/CONFIGURATION.md
+* clone this repository => https://github.com/hardyantz/go-kafka
+* run glide install
+
+#### Producer
+##### simple producer with one message inline
+```
+$ go run simpleProducer.go
+```
+##### simple producer with one message with cli argument
+```
+$ go run sendMessage.go <topic> <message>
+
+// example
+
+$ go run sendMessage.go test hallo-test
+```
+
+##### simple producer with bulk message
+```
+$ go run kafkaProducer.go
+```
+*) press ctrl+c to SIGINT
+
+
+
+#### Consumer
+
+##### simple consumer with one message and from earliest message
+```
+$ go run simpleConsumer.go
+
+$ go run kafkaConsumer.go
+```
+### simple consumer with offset message
+```
+$ go run offsetConsumer.go
+```
+
+# Kafka Next Step
+
+## Retention log setup
+
+Log retention setup is The minimum age of a log file to be eligible for deletion due to age,
+means that kafka will save message for period of hours. default is 168 hours or 7 days
+to change this setup edit `config/server-properties` and change the value of
+```
+log.retention.hours=168
+```
+
+## Partition
+in kafka, you can set numbers of partition you want to setup.
+
+How to :
+
+#### edit config file
+edit config file in `config/server-properties` and change the value of
+```
+num.partitions=3
+```
+you can set the default number of log partitions per topic. More partitions allow greater
+parallelism for consumption, but this will also result in more files across the brokers.
+
+
+#### Setup topic partition
+previously we already setup topic `test`. now lets setup topic `test` into 2 partitions.
+change directory to kafka folder, and run
+```
+$ ./bin/kafka-topics.sh --zookeeper localhost:2181 --alter --topic test --partitions 2
+```
+lets test the status of the partition by typing
+```
+$ ./bin/kafka-topics.sh --describe --zookeeper localhost:2181 --topic test
+```
+
+you will see the result that topic test is set partition to 2 partition
+```
+Topic:test	    PartitionCount:2	ReplicationFactor:1	Configs:
+	Topic: test	Partition: 0	Leader: 0	Replicas: 0	Isr: 0
+	Topic: test	Partition: 1	Leader: 0	Replicas: 0	Isr: 0
+
+```
+
+if you want to test how the message receive in broker.
+test with run the consumer with `partition 0` & `partition 1` .
+if partition running well. you will see that the consumer will receieve message alternately.
+
+example :
+consumer partition 0
+```
+$ ./bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --partition 0
+one
+three
+```
+
+consumer partition 1
+```
+bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --partition 0
+two
+four
+```
+
+producer
+```
+$ ./bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test
+>one
+>two
+>three
+>four
+```
+
+#### setup replication
+to setup replication you have to create new config for every replication (port).
+
+##### create config file
+
+###### replication 1
+example :
+create or copy from the existing config file. let say we create `server-1.properties` in config folder.
+and set `broker.id=1` and `port=9093`
+open `server-1.properties` and edit
+
+```
+broker.id=1  #must be unique for every replication
+listeners=PLAINTEXT://:9093  #port to listen 9093
+```
+
+###### replication 2
+example :
+create or copy from the existing config file. let say we create `server-2.properties` in config folder.
+and set `broker.id=2` and `port=9094`
+open `server-2.properties` and edit
+
+```
+broker.id=2  #must be unique for every replication
+listeners=PLAINTEXT://:9094  #port to listen 9094
+```
+
+###### start server
+
+replication 1
+```
+$ ./bin/kafka-server-start.sh config/server-1.properties
+```
+
+replication 2
+```
+$ ./bin/kafka-server-start.sh config/server-2.properties
+```
+
+###### create topic
+create topic with 2 replication & 2 partitions
+
+```
+$ ./bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 2 --partitions 2 --topic testreplica
+```
+
+###### check status
+check status replication & partition for topic `testreplica`
+```
+$ ./bin/kafka-topics.sh --describe --zookeeper localhost:2181 --topic testreplica
+```
+the result will be
+
+```
+Topic:testreplica	PartitionCount:2	ReplicationFactor:2	Configs:
+	Topic: testreplica	Partition: 0	Leader: 1	Replicas: 1,2	Isr: 1,2
+	Topic: testreplica	Partition: 1	Leader: 2	Replicas: 2,1	Isr: 2,1
+```
+
+
+
 cheers,
-hope you like it.
+
+hope you enjoy it
+
+
+source :
+* tutorialspoint.com
+* kafka.apache.org
