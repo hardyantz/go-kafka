@@ -75,6 +75,6 @@ $ go run kafkaConsumer.go
 $ go run offsetConsumer.go
 ```
 
-## Wiki page
-(tbd)
+## tutorial
+https://hardyantz.github.io/go-kafka/
 
