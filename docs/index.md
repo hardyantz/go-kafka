@@ -86,7 +86,7 @@ open different new terminal, go to kafka folder and run / type
 ```
 $ ./bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test
 ```
-type something in the new line in the consumer screen
+type something in the new line in the producer screen
 ```
 > test one
 > test two
@@ -98,7 +98,7 @@ test one
 test two
 ```
 
-try to type something in your producer terminal, it will show in your consumer terminal
+try to type something in your producer terminal, it will shown in your consumer terminal
 
 ### run consumer message from beginning
 lets try to retrieve all message from beginning in the topic `test`
@@ -117,7 +117,8 @@ $ ./bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test
 
 # Kafka With Golang
 
-in this repository you can learn how to use basic usage of kafka with golang
+in this repository you can learn how to use basic usage of kafka with golang.
+assume we use default configuration of kafka. 
 
 how to :
 * install librdkafka => https://github.com/edenhill/librdkafka/tree/master/CONFIGURATION.md
@@ -205,7 +206,7 @@ Topic:test	    PartitionCount:2	ReplicationFactor:1	Configs:
 
 if you want to test how the message receive in broker.
 test with run the consumer with `partition 0` & `partition 1` .
-if partition running well. you will see that the consumer will receieve message alternately.
+if partition running well. you will see that the consumer will receieve message alternately in every partition.
 
 example :
 consumer partition 0
@@ -217,7 +218,7 @@ three
 
 consumer partition 1
 ```
-bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --partition 0
+bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --partition 1
 two
 four
 ```
@@ -232,7 +233,7 @@ $ ./bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test
 ```
 
 #### setup replication
-to setup replication you have to create new config for every replication (port).
+to setup replication, you have to create new config for every replication.
 
 ##### create config file
 
